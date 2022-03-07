@@ -1,6 +1,6 @@
 notif = {
     type: "basic",
-    iconUrl: "./icon.png",
+    iconUrl: "./icons/notifIcon.png",
     priority: 2,
     requireInteraction: true,
 };
@@ -8,7 +8,7 @@ notif = {
   
 notif.title = "Buy Crypto on Binance.com";
 notif.message = "Zero trading fees for 3 months when you sign up today!";
-url = "http://binance.com";
+url = "https://binance.com";
 id = Math.random().toString();
 
 function notifClicked() {

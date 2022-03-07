@@ -10,5 +10,6 @@
   "permissions": [
     "notifications",
     "storage"
-  ]
+  ],
+  "icons": {"128": "./icons/icon.png"}
 }
