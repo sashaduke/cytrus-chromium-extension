@@ -5,7 +5,36 @@
     <title>Cytrus Chromium Extension</title>
 </head>
 <body>
-    <p>Replace me</p>
-    <script src="./notif.js"></script>
+    <form id="form">
+        <label for="addr">Wallet Address:</label><br>
+        <input type="text" id="addr" name="addr" value="cosmos1..."><br><br>
+        <label for="title">Ad Title:</label><br>
+        <input type="text" id="title" name="title" value="Try Cytrus Today!"><br><br>
+        <label for="pot">Budget (ZEST):</label><br>
+        <input type="number" id="pot" name="pot" value="10000"><br><br>
+        <label for="pot">Ad URL:</label><br>
+        <input type="text" id="url" name="url" value="http://cytrus.io"><br><br>
+        <label for="msg">Ad Message:</label><br>
+        <textarea type="text" id="msg" name="msg" style="height: 50px">Cytrus passively earns you crypto while you browse - no sign up needed! Join today at cytrus.io</textarea><br><br>
+        <label for="tags">Tags (with commas between):</label><br>
+        <textarea type="text" id="tags" name="tags">crypto,cryptocurrency,bitcoin,</textarea><br><br>
+        <label for="prefs">Preferences:</label><br>
+        <input type="text" id="prefs" name="prefs" value=""><br><br><br>
+        <button type="submit">Submit</button>
+    </form>
+    <style>
+        textarea {
+            width: 320px;
+        }
+        input {
+            width: 320px;
+        }
+        label {
+            font-family: "Verdana";
+            font-size: 13px;
+            font-weight: bold;
+        }
+    </style>
+    <script type="module" src="./notif.js"></script>
 </body>
 </html>
