@@ -7,7 +7,7 @@ const baseMsgCreatePromo = {
     title: "",
     pot: 0,
     url: "",
-    message: "",
+    msg: "",
     tags: "",
     prefs: "",
 };
@@ -25,8 +25,8 @@ export const MsgCreatePromo = {
         if (message.url !== "") {
             writer.uint32(34).string(message.url);
         }
-        if (message.message !== "") {
-            writer.uint32(42).string(message.message);
+        if (message.msg !== "") {
+            writer.uint32(42).string(message.msg);
         }
         if (message.tags !== "") {
             writer.uint32(50).string(message.tags);
@@ -56,7 +56,7 @@ export const MsgCreatePromo = {
                     message.url = reader.string();
                     break;
                 case 5:
-                    message.message = reader.string();
+                    message.msg = reader.string();
                     break;
                 case 6:
                     message.tags = reader.string();
@@ -97,11 +97,11 @@ export const MsgCreatePromo = {
         else {
             message.url = "";
         }
-        if (object.message !== undefined && object.message !== null) {
-            message.message = String(object.message);
+        if (object.msg !== undefined && object.msg !== null) {
+            message.msg = String(object.msg);
         }
         else {
-            message.message = "";
+            message.msg = "";
         }
         if (object.tags !== undefined && object.tags !== null) {
             message.tags = String(object.tags);
@@ -123,7 +123,7 @@ export const MsgCreatePromo = {
         message.title !== undefined && (obj.title = message.title);
         message.pot !== undefined && (obj.pot = message.pot);
         message.url !== undefined && (obj.url = message.url);
-        message.message !== undefined && (obj.message = message.message);
+        message.msg !== undefined && (obj.msg = message.msg);
         message.tags !== undefined && (obj.tags = message.tags);
         message.prefs !== undefined && (obj.prefs = message.prefs);
         return obj;
@@ -154,11 +154,11 @@ export const MsgCreatePromo = {
         else {
             message.url = "";
         }
-        if (object.message !== undefined && object.message !== null) {
-            message.message = object.message;
+        if (object.msg !== undefined && object.msg !== null) {
+            message.msg = object.msg;
         }
         else {
-            message.message = "";
+            message.msg = "";
         }
         if (object.tags !== undefined && object.tags !== null) {
             message.tags = object.tags;
