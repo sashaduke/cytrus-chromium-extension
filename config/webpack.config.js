@@ -12,7 +12,8 @@ const config = (env, argv) => merge(common, {
     contentScript: PATHS.src + '/contentScript.js',
     background: PATHS.src + '/background.js',
     notif: PATHS.src + '/notif.js',
-    tx: PATHS.src + '/tx.js'
+    tx: PATHS.src + '/tx.js',
+    rest: PATHS.src + '/rest.js'
   },
   devtool: argv.mode === 'production' ? false : 'source-map'
 });
