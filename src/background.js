@@ -24,9 +24,10 @@ const notif = {
 };
 
 const initClient = async function() {
-    let mnemonic = ""
+    let mnemonic = "";
     chrome.storage.local.get({mnemonic: ""}, function(result) {
         mnemonic = result.mnemonic;
+        console.log(mnemonic)
     });
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic);
     const [user] = await wallet.getAccounts();
@@ -83,6 +84,7 @@ const displayPromo = async function() {
 };
 
 const checkTimestamp = function() {
+    //chrome.storage.local.get({mnemonic: ""}, function(result) {console.log(result.mnemonic)});
     chrome.storage.local.get({nextPromo: Date.now() + 10000}, function(a) {
         chrome.storage.local.set({nextPromo: a.nextPromo});
         if (Date.now() >= a.nextPromo) {
