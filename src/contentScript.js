@@ -2,8 +2,6 @@ chrome.storage.local.get({pagesOpened: 0}, function(result) {
     chrome.storage.local.set({pagesOpened: result.pagesOpened + 1});
 });
 
-//var port = chrome.runtime.connect();
-
 window.addEventListener("message", (event) => {
   if (event.source != window) {
     return;
@@ -16,7 +14,6 @@ window.addEventListener("message", (event) => {
         chrome.storage.local.get({mnemonic: ""}, function(result) {console.log(result.mnemonic)});
     }
     console.log("Content script received: " + event.data.mnemonic);
-    //port.postMessage(event.data.mnemonic);
   }
 }, false);
 
