@@ -23,64 +23,70 @@ const notif = {
     requireInteraction: true,
 };
 
-const initClient = async function() {
-    let mnemonic = "";
-    chrome.storage.local.get({mnemonic: ""}, function(result) {
-        mnemonic = result.mnemonic;
-        console.log(mnemonic)
-    });
-    const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic);
-    const [user] = await wallet.getAccounts();
-    const client = await SigningStargateClient.connectWithSigner(
-        rpcEndpoint,
-        wallet,
-        { registry: registry }
-    );
-    return {user: user, client: client};
-};
-
 const promoClicked = async function(id) {
-    const c = await initClient();
-    const promo = await api.queryPromo(id);
-    let url = promo.data.promo.url;
-    if (url.substring(0, 4) != "http") {
-        url = "http://" + url;
-    }
-    chrome.tabs.create({url: url});
-    chrome.notifications.clear(id);
-    const val = {
-        creator: c.user.address,
-        id: id
-    };
-    const msg = {
-        typeUrl: types[0][0],
-        value: val
-    };
-    const result = await c.client.signAndBroadcast(c.user.address, [msg], fee);
-    console.log(result);
+    chrome.storage.local.get({mnemonic: ""}, async function(resp) {
+        const wallet = await DirectSecp256k1HdWallet.fromMnemonic(
+            resp.mnemonic,
+            {prefix: "cytrus"}
+        );
+        const [user] = await wallet.getAccounts();
+        const client = await SigningStargateClient.connectWithSigner(
+            rpcEndpoint,
+            wallet,
+            { registry: registry }
+        );
+        const promo = await api.queryPromo(id);
+        let url = promo.data.promo.url;
+        if (url.substring(0, 4) != "http") {
+            url = "http://" + url;
+        }
+        chrome.tabs.create({url: url});
+        chrome.notifications.clear(id);
+        const val = {
+            creator: user.address,
+            id: id
+        };
+        const msg = {
+            typeUrl: types[0][0],
+            value: val
+        };
+        const result = await client.signAndBroadcast(user.address, [msg], fee);
+        console.log(result);
+    });
 };
 chrome.notifications.onClicked.addListener(promoClicked);
 
 
 const displayPromo = async function() {
-    const c = await initClient();
-    const promos = await api.queryPromoAll("");
-    const rand = Math.floor(Math.random() * promos.data.promo.length);
-    const promo = promos.data.promo[rand];
-    const id = promo.index;
-    notif.title = promo.title;
-    notif.message = promo.msg;
-    chrome.notifications.create(id.toString(), notif);
-    const val = {
-        creator: c.user.address,
-        id: id
-    };
-    const msg = {
-        typeUrl: types[1][0],
-        value: val
-    };
-    const result = await c.client.signAndBroadcast(c.user.address, [msg], fee);
-    console.log(result);
+    chrome.storage.local.get({mnemonic: ""}, async function(resp) {
+        const wallet = await DirectSecp256k1HdWallet.fromMnemonic(
+            resp.mnemonic,
+            {prefix: "cytrus"}
+        );
+        const [user] = await wallet.getAccounts();
+        const client = await SigningStargateClient.connectWithSigner(
+            rpcEndpoint,
+            wallet,
+            { registry: registry }
+        );
+        const promos = await api.queryPromoAll("");
+        const rand = Math.floor(Math.random() * promos.data.promo.length);
+        const promo = promos.data.promo[rand];
+        const id = promo.index;
+        notif.title = promo.title;
+        notif.message = promo.msg;
+        chrome.notifications.create(id.toString(), notif);
+        const val = {
+            creator: user.address,
+            id: id
+        };
+        const msg = {
+            typeUrl: types[1][0],
+            value: val
+        };
+        const result = await client.signAndBroadcast(user.address, [msg], fee);
+        console.log(result);
+    });
 };
 
 const checkTimestamp = function() {
