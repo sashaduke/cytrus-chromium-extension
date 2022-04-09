@@ -9,7 +9,6 @@ const PATHS = require('./paths');
 const config = (env, argv) => merge(common, {
   entry: {
     background: PATHS.src + '/background.js',
-    popup: PATHS.src + '/popup.js',
     contentScript: PATHS.src + '/contentScript.js',
     tx: PATHS.src + '/tx.js',
     rest: PATHS.src + '/rest.js'

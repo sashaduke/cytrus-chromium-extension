@@ -84,8 +84,7 @@ const displayPromo = async function() {
 };
 
 const checkTimestamp = function() {
-    //chrome.storage.local.get({mnemonic: ""}, function(result) {console.log(result.mnemonic)});
-    chrome.storage.local.get({nextPromo: Date.now() + 10000}, function(a) {
+    chrome.storage.local.get({nextPromo: Date.now() + 100000}, function(a) {
         chrome.storage.local.set({nextPromo: a.nextPromo});
         if (Date.now() >= a.nextPromo) {
             chrome.storage.local.get({pagesOpenedLast: 0}, function(b) {
@@ -102,7 +101,7 @@ const checkTimestamp = function() {
 }
 
 checkTimestamp();
-chrome.alarms.create({periodInMinutes: 0.02});
+chrome.alarms.create({periodInMinutes: 0.2});
 chrome.alarms.onAlarm.addListener(function() {
     checkTimestamp();
 });
