@@ -89,7 +89,7 @@ const checkTimestamp = function() {
         if (Date.now() >= a.nextPromo) {
             chrome.storage.local.get({pagesOpenedLast: 0}, function(b) {
                 chrome.storage.local.get({pagesOpened: 0}, function(c) {
-                    chrome.storage.local.set({nextPromo: Date.now() + 10000});
+                    chrome.storage.local.set({nextPromo: Date.now() + 100000});
                     if (b.pagesOpenedLast < c.pagesOpened) {
                         chrome.storage.local.set({pagesOpenedLast: c.pagesOpened});
                         displayPromo();
