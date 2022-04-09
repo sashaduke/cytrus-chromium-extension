@@ -13,14 +13,14 @@ const fee = {
     amount: [],
     gas: "200000"
 };
-const mnemonic = "six dog stable much drop wonder broccoli child slight ancient stick reunion trophy nut evoke ecology brass razor uncover robust unlock dial correct deny";
+const mnemonic = "";
 const rpcEndpoint = "http://zestcha.in:26657";
-const apiEndpoint = "http://zestcha.in:1317";
+const apiEndpoint = "http://zestcha.in";
 const api = new Api({ baseUrl: apiEndpoint });
 
 const notif = {
-    type: 'basic',
-    iconUrl: './icons/notifIcon.png',
+    type: "basic",
+    iconUrl: "./icons/notifIcon.png",
     priority: 2,
     requireInteraction: true,
 };
@@ -35,18 +35,6 @@ const initClient = async function() {
     );
     return {user: user, client: client};
 };
-
-
-const createPromo = async function(promo) {
-    const c = await initClient();
-    const msg = {
-        typeUrl: types[2][0],
-        value: promo
-    };
-    const result = await c.client.signAndBroadcast(c.user.address, [msg], fee);
-    console.log(result);
-};
-
 
 const promoClicked = async function(id) {
     const c = await initClient();
@@ -92,51 +80,30 @@ const displayPromo = async function() {
     console.log(result);
 };
 
-/*
-const submitForm = function(event) {
-    const creator = document.getElementById('addr').value;
-    const title = document.getElementById('title').value;
-    const pot = parseInt(document.getElementById('pot').value);
-    const url = document.getElementById('url').value;
-    const msg = document.getElementById('msg').value;
-    const tags = document.getElementById('tags').value;
-    const prefs = document.getElementById('prefs').value;
-   
-    const promo = {
-        creator: creator,
-        title: title,
-        pot: pot,
-        url: url,
-        msg: msg,
-        tags: tags,
-        prefs: prefs,
-    };
-
-    event.preventDefault();
-    createPromo(promo);
-};
-const form = document.getElementById('form');
-form.addEventListener('submit', submitForm);
-*/
-
-const display = function() {
-    const next = Date.now() + 100000;
-    chrome.storage.local.set({'nextPromo': next});
-    displayPromo();
-}
-
 const checkTimestamp = function() {
-    chrome.storage.local.get('nextPromo', function(result){
-        if (Date.now() >= result.nextPromo) {
-            display();
+    chrome.storage.local.get({nextPromo: Date.now() + 10000}, function(a) {
+        chrome.storage.local.set({nextPromo: a.nextPromo});
+        console.log(Date.now())
+        console.log(a.nextPromo)
+        if (Date.now() >= a.nextPromo) {
+            chrome.storage.local.get({pagesOpenedLast: 0}, function(b) {
+                chrome.storage.local.get({pagesOpened: 0}, function(c) {
+                    if (b.pagesOpenedLast < c.pagesOpened) {
+                        chrome.storage.local.set({pagesOpenedLast: c.pagesOpened});
+                        chrome.storage.local.set({nextPromo: Date.now() + 10000});
+                        displayPromo();
+                    }
+                }); 
+            });
         }
     });
 }
 
-const next = Date.now() + 100000;
-chrome.storage.local.set({'nextPromo': next});
-chrome.alarms.create({periodInMinutes: 0.2});
-
+chrome.storage.local.get({mnemonic: ""}, function(result) {
+    mnemonic = result.mnemonic;
+});
+checkTimestamp();
+chrome.alarms.create({periodInMinutes: 0.02});
 chrome.alarms.onAlarm.addListener(function() {
     checkTimestamp();
 });
