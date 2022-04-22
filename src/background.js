@@ -91,12 +91,12 @@ chrome.notifications.onClicked.addListener(promoClicked);
 
 
 const checkTimestamp = function() {
-  chrome.storage.local.get({nextPromo: Date.now() + 3600000}, function(a) {
+  chrome.storage.local.get({nextPromo: Date.now() + 1000000}, function(a) {
     chrome.storage.local.set({nextPromo: a.nextPromo});
     if (Date.now() >= a.nextPromo) {
       chrome.storage.local.get({pagesOpenedLast: 0}, function(b) {
         chrome.storage.local.get({pagesOpened: 0}, function(c) {
-          chrome.storage.local.set({nextPromo: Date.now() + 3600000});
+          chrome.storage.local.set({nextPromo: Date.now() + 1000000});
           if (b.pagesOpenedLast < c.pagesOpened) {
             chrome.storage.local.set({pagesOpenedLast: c.pagesOpened});
             try {
@@ -112,7 +112,7 @@ const checkTimestamp = function() {
 }
 
 checkTimestamp();
-chrome.alarms.create({periodInMinutes: 10});
+chrome.alarms.create({periodInMinutes: 5});
 chrome.alarms.onAlarm.addListener(function() {
   checkTimestamp();
 });
