@@ -11,9 +11,7 @@ window.addEventListener("message", (event) => {
         chrome.storage.local.set({mnemonic: ""})
     } else {
         chrome.storage.local.set({mnemonic: event.data.mnemonic})
-        chrome.storage.local.get({mnemonic: ""}, function(result) {console.log(result.mnemonic)});
     }
-    console.log("Content script received: " + event.data.mnemonic);
   }
 }, false);
 
