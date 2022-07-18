@@ -1,0 +1,13 @@
+{
+  "name": "Cytrus Chromium Extension",
+  "description": "Serves promotions from the Cytrus network",
+  "version": "0.0.1",
+  "manifest_version": 2,
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_title": "Cytrus Chromium Extension"
+  },
+  "permissions": [
+    "notifications"
+  ]
+}
