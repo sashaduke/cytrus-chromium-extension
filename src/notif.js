@@ -1,6 +1,7 @@
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { Registry, DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { MsgPromoClicked, MsgPromoViewed, MsgCreatePromo } from "./tx.js";
+import { Api } from "./rest.js"
 
 const types = [
     ["/cytruslabs.zestchain.zestchain.MsgPromoClicked", MsgPromoClicked],
@@ -10,56 +11,97 @@ const types = [
 const registry = new Registry(types);
 const fee = {
     amount: [],
-    gas: "200000",
+    gas: "200000"
 };
-const mnemonic = "choose crack spoon large rally divide eagle cube magnet dial common angle welcome enact shadow hand hockey cost stem sunny fabric thank grief region";
+const mnemonic = "six dog stable much drop wonder broccoli child slight ancient stick reunion trophy nut evoke ecology brass razor uncover robust unlock dial correct deny";
 const rpcEndpoint = "http://zestcha.in:26657";
+const apiEndpoint = "http://zestcha.in:1317";
+const api = new Api({ baseUrl: apiEndpoint });
 
-let notif = {
+const notif = {
     type: 'basic',
     iconUrl: './icons/notifIcon.png',
     priority: 2,
     requireInteraction: true,
 };
-//TO DO: Load promo details from http://zestcha.in:1317/cytruslabs/zestchain/zestchain/promo
 
-notif.title = 'Buy Crypto on Binance.com';
-notif.message = 'Zero trading fees for 3 months when you sign up today!';
-let notifURL = 'https://binance.com';
-let id = Math.random().toString();
-
-function notifClicked() {
-    chrome.tabs.create({url: notifURL});
-    chrome.notifications.clear(id);
-};
-chrome.notifications.onClicked.addListener(notifClicked);
-
-async function sendMsgCreatePromo(promo) {
+const initClient = async function() {
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic);
-    const [shulgin] = await wallet.getAccounts();
+    const [user] = await wallet.getAccounts();
     const client = await SigningStargateClient.connectWithSigner(
         rpcEndpoint,
         wallet,
         { registry: registry }
     );
+    return {user: user, client: client};
+};
+
+
+const createPromo = async function(promo) {
+    const c = await initClient();
     const msg = {
         typeUrl: types[2][0],
         value: promo
     };
-    const result = await client.signAndBroadcast(shulgin.address, [msg], fee);
+    const result = await c.client.signAndBroadcast(c.user.address, [msg], fee);
     console.log(result);
 };
 
-function submitForm(event) {
-    let creator = document.getElementById('addr').value;
-    let title = document.getElementById('title').value;
-    let pot = parseInt(document.getElementById('pot').value);
-    let url = document.getElementById('url').value;
-    let msg = document.getElementById('msg').value;
-    let tags = document.getElementById('tags').value;
-    let prefs = document.getElementById('prefs').value;
+
+const promoClicked = async function(id) {
+    const c = await initClient();
+    const promo = await api.queryPromo(id);
+    let url = promo.data.promo.url;
+    if (url.substring(0, 4) != "http") {
+        url = "http://" + url;
+    }
+    chrome.tabs.create({url: url});
+    chrome.notifications.clear(id);
+    const val = {
+        creator: c.user.address,
+        id: id
+    };
+    const msg = {
+        typeUrl: types[0][0],
+        value: val
+    };
+    const result = await c.client.signAndBroadcast(c.user.address, [msg], fee);
+    console.log(result);
+};
+chrome.notifications.onClicked.addListener(promoClicked);
+
+
+const displayPromo = async function() {
+    const c = await initClient();
+    const promos = await api.queryPromoAll("");
+    const rand = Math.floor(Math.random() * promos.data.promo.length);
+    const promo = promos.data.promo[rand];
+    const id = promo.index;
+    notif.title = promo.title;
+    notif.message = promo.msg;
+    chrome.notifications.create(id.toString(), notif);
+    const val = {
+        creator: c.user.address,
+        id: id
+    };
+    const msg = {
+        typeUrl: types[1][0],
+        value: val
+    };
+    const result = await c.client.signAndBroadcast(c.user.address, [msg], fee);
+    console.log(result);
+};
+
+const submitForm = function(event) {
+    const creator = document.getElementById('addr').value;
+    const title = document.getElementById('title').value;
+    const pot = parseInt(document.getElementById('pot').value);
+    const url = document.getElementById('url').value;
+    const msg = document.getElementById('msg').value;
+    const tags = document.getElementById('tags').value;
+    const prefs = document.getElementById('prefs').value;
    
-    let promo = {
+    const promo = {
         creator: creator,
         title: title,
         pot: pot,
@@ -70,10 +112,10 @@ function submitForm(event) {
     };
 
     event.preventDefault();
-    sendMsgCreatePromo(promo);
+    createPromo(promo);
 };
-
-chrome.notifications.create(id, notif);
-let form = document.getElementById('form');
+const form = document.getElementById('form');
 form.addEventListener('submit', submitForm);
+
+displayPromo();
 
