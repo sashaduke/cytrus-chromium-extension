@@ -11,7 +11,6 @@ const config = (env, argv) => merge(common, {
     popup: PATHS.src + '/popup.js',
     contentScript: PATHS.src + '/contentScript.js',
     background: PATHS.src + '/background.js',
-    notif: PATHS.src + '/notif.js',
     tx: PATHS.src + '/tx.js',
     rest: PATHS.src + '/rest.js'
   },
