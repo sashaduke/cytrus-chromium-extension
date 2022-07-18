@@ -28,5 +28,8 @@
         "contentScript.js"
       ]
     }
-  ]
+  ],
+  "externally_connectable": {
+    "matches": ["http://cytrus.io/*"]
+  }
 }
