@@ -4,38 +4,37 @@ import { MsgPromoClicked, MsgPromoViewed } from "./tx.js";
 import { Api } from "./rest.js"
 
 
-const types = [
-  [ "/cytruslabs.zestchain.zestchain.MsgPromoClicked", MsgPromoClicked ],
-  [ "/cytruslabs.zestchain.zestchain.MsgPromoViewed", MsgPromoViewed ],
-];
-const registry = new Registry(types);
-const fee = {
-  amount: [],
-  gas: "200000"
-};
-const rpcEndpoint = "http://zestcha.in:26657";
-const apiEndpoint = "http://zestcha.in";
-const api = new Api({ baseUrl: apiEndpoint });
-
 const notif = {
   type: "basic",
   iconUrl: "./icons/notifIcon.png",
   priority: 2,
   requireInteraction: true,
 };
+const fee = {
+  amount: [],
+  gas: "200000"
+};
+const types = [
+  ["/cytruslabs.zestchain.zestchain.MsgPromoClicked", MsgPromoClicked],
+  ["/cytruslabs.zestchain.zestchain.MsgPromoViewed", MsgPromoViewed],
+];
+const registry = new Registry(types);
+const rpcEndpoint = "http://zestcha.in:26657";
+const apiEndpoint = "http://zestcha.in";
+const api = new Api({baseUrl: apiEndpoint});
 
 
 const displayPromo = async function() {
-  chrome.storage.local.get({ mnemonic: "" }, async function(resp) {
+  chrome.storage.local.get({cytrus_sk: ""}, async function(resp) {
     const wallet = await DirectSecp256k1HdWallet.deserialize(
-      resp.mnemonic,
-      "cytrus"
+      resp.cytrus_sk,
+      "cytrus_sk"
     );
     const [user] = await wallet.getAccounts();
     const client = await SigningStargateClient.connectWithSigner(
       rpcEndpoint,
       wallet,
-      { registry: registry }
+      {registry: registry}
     );
     const promos = await api.queryPromoAll("");
     const rand = Math.floor(Math.random() * promos.data.promo.length);
@@ -58,16 +57,16 @@ const displayPromo = async function() {
 };
 
 const promoClicked = async function(id) {
-  chrome.storage.local.get({ mnemonic: "" }, async function(resp) {
+  chrome.storage.local.get({cytrus_sk: ""}, async function(resp) {
     const wallet = await DirectSecp256k1HdWallet.deserialize(
-      resp.mnemonic,
-      "cytrus"
+      resp.cytrus_sk,
+      "cytrus_sk"
     );
     const [user] = await wallet.getAccounts();
     const client = await SigningStargateClient.connectWithSigner(
       rpcEndpoint,
       wallet,
-      { registry: registry }
+      {registry: registry}
     );
     const promo = await api.queryPromo(id);
     let url = promo.data.promo.url;
@@ -92,12 +91,12 @@ chrome.notifications.onClicked.addListener(promoClicked);
 
 
 const checkTimestamp = function() {
-  chrome.storage.local.get({nextPromo: Date.now() + 10000}, function(a) {
+  chrome.storage.local.get({nextPromo: Date.now() + 3600000}, function(a) {
     chrome.storage.local.set({nextPromo: a.nextPromo});
     if (Date.now() >= a.nextPromo) {
       chrome.storage.local.get({pagesOpenedLast: 0}, function(b) {
         chrome.storage.local.get({pagesOpened: 0}, function(c) {
-          chrome.storage.local.set({nextPromo: Date.now() + 10000});
+          chrome.storage.local.set({nextPromo: Date.now() + 3600000});
           if (b.pagesOpenedLast < c.pagesOpened) {
             chrome.storage.local.set({pagesOpenedLast: c.pagesOpened});
             try {
@@ -113,7 +112,7 @@ const checkTimestamp = function() {
 }
 
 checkTimestamp();
-chrome.alarms.create({periodInMinutes: 0.02});
+chrome.alarms.create({periodInMinutes: 10});
 chrome.alarms.onAlarm.addListener(function() {
   checkTimestamp();
 });
