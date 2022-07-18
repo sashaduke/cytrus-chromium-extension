@@ -119,18 +119,24 @@ const form = document.getElementById('form');
 form.addEventListener('submit', submitForm);
 */
 
-function display() {
-    const next = Date.now() + 600000;
-    chrome.storage.sync.set({'nextPromo': next});
+const display = function() {
+    const next = Date.now() + 100000;
+    chrome.storage.local.set({'nextPromo': next});
     displayPromo();
 }
 
-function checkTimestamp() {
-    chrome.storage.sync.get('nextPromo', function(result){
+const checkTimestamp = function() {
+    chrome.storage.local.get('nextPromo', function(result){
         if (Date.now() >= result.nextPromo) {
             display();
         }
     });
 }
-display();
-setInterval(checkTimestamp, 60000);
+
+const next = Date.now() + 100000;
+chrome.storage.local.set({'nextPromo': next});
+chrome.alarms.create({periodInMinutes: 0.2});
+
+chrome.alarms.onAlarm.addListener(function() {
+    checkTimestamp();
+});
