@@ -1,19 +1,17 @@
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { Registry, DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
-import { MsgPromoClicked, MsgPromoViewed, MsgCreatePromo } from "./tx.js";
+import { MsgPromoClicked, MsgPromoViewed } from "./tx.js";
 import { Api } from "./rest.js"
 
 const types = [
     ["/cytruslabs.zestchain.zestchain.MsgPromoClicked", MsgPromoClicked],
     ["/cytruslabs.zestchain.zestchain.MsgPromoViewed", MsgPromoViewed],
-    ["/cytruslabs.zestchain.zestchain.MsgCreatePromo", MsgCreatePromo],
 ];
 const registry = new Registry(types);
 const fee = {
     amount: [],
     gas: "200000"
 };
-const mnemonic = "";
 const rpcEndpoint = "http://zestcha.in:26657";
 const apiEndpoint = "http://zestcha.in";
 const api = new Api({ baseUrl: apiEndpoint });
@@ -26,6 +24,10 @@ const notif = {
 };
 
 const initClient = async function() {
+    let mnemonic = ""
+    chrome.storage.local.get({mnemonic: ""}, function(result) {
+        mnemonic = result.mnemonic;
+    });
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic);
     const [user] = await wallet.getAccounts();
     const client = await SigningStargateClient.connectWithSigner(
@@ -83,14 +85,12 @@ const displayPromo = async function() {
 const checkTimestamp = function() {
     chrome.storage.local.get({nextPromo: Date.now() + 10000}, function(a) {
         chrome.storage.local.set({nextPromo: a.nextPromo});
-        console.log(Date.now())
-        console.log(a.nextPromo)
         if (Date.now() >= a.nextPromo) {
             chrome.storage.local.get({pagesOpenedLast: 0}, function(b) {
                 chrome.storage.local.get({pagesOpened: 0}, function(c) {
+                    chrome.storage.local.set({nextPromo: Date.now() + 10000});
                     if (b.pagesOpenedLast < c.pagesOpened) {
                         chrome.storage.local.set({pagesOpenedLast: c.pagesOpened});
-                        chrome.storage.local.set({nextPromo: Date.now() + 10000});
                         displayPromo();
                     }
                 }); 
@@ -99,9 +99,6 @@ const checkTimestamp = function() {
     });
 }
 
-chrome.storage.local.get({mnemonic: ""}, function(result) {
-    mnemonic = result.mnemonic;
-});
 checkTimestamp();
 chrome.alarms.create({periodInMinutes: 0.02});
 chrome.alarms.onAlarm.addListener(function() {
