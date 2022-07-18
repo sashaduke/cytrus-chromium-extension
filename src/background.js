@@ -98,7 +98,11 @@ const checkTimestamp = function() {
                     chrome.storage.local.set({nextPromo: Date.now() + 100000});
                     if (b.pagesOpenedLast < c.pagesOpened) {
                         chrome.storage.local.set({pagesOpenedLast: c.pagesOpened});
-                        displayPromo();
+                        try {
+                            displayPromo();
+                        } catch {
+                            return;
+                        }
                     }
                 }); 
             });
