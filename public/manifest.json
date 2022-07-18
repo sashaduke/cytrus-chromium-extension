@@ -11,7 +11,7 @@
   },
   "action": {
     "default_title": "Cytrus",
-    "default_popup": "notif.html"
+    "default_popup": "popup.html"
   },
   "permissions": [
     "notifications",
