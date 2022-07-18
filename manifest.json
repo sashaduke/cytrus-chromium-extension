@@ -3,7 +3,7 @@
   "description": "Serves promotions from the Cytrus network",
   "version": "0.0.1",
   "manifest_version": 3,
-  "browser_action": {
+  "action": {
     "default_popup": "notif.html",
     "default_title": "Cytrus Chromium Extension"
   },
